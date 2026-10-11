@@ -1,6 +1,6 @@
-# Sum Sprint (Android)
+# Mia's scale (Android)
 
-A native Android wrapper around the Sum Sprint web game. The game itself lives in
+A native Android wrapper around the Mia's scale web game. The game itself lives in
 `app/src/main/assets/index.html` and runs inside a WebView.
 
 ## Build the APK
@@ -17,3 +17,6 @@ To change the game, edit `index.html` in `app/src/main/assets/` and rebuild.
 2. Open the repo's Actions tab and wait for "Build APK" to finish (about 3 minutes).
 3. Open the finished run, download the `SumSprint-apk` artifact, unzip it and copy `app-debug.apk` to your phone.
 4. Tap the file and allow "Install unknown apps" when Android asks.
+
+## App ID
+The app ID is `com.miascale.app` (set in `app/build.gradle.kts`). It must be unique on Google Play and cannot be changed after you publish.

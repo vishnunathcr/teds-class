@@ -1,6 +1,6 @@
 <resources>
-    <color name="paper">#EEF3F7</color>
-    <color name="ic_bg">#1B2A6B</color>
+    <color name="paper">#FBF3E0</color>
+    <color name="ic_bg">#FBF3E0</color>
     <style name="Theme.SumSprint" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/paper</item>
         <item name="android:statusBarColor">@color/paper</item>

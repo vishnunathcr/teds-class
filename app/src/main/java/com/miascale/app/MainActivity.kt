@@ -1,4 +1,4 @@
-package com.example.sumsprint
+package com.miascale.app
 
 import android.annotation.SuppressLint
 import android.app.Activity

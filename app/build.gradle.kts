@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sumsprint"
+    namespace = "com.miascale.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.sumsprint"
+        applicationId = "com.miascale.app"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
