@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sum Sprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#eef3f7; --grid:#cfdce6; --ink:#1b2a6b; --muted:#5a6794; --red:#d6453d; --good:#1f8a5b; --card:#f8fbfd;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#12172b;--grid:#222a4a;--ink:#dbe4ff;--muted:#8f9bc9;--red:#ff7a6e;--good:#5fd6a0;--card:#1a2140;}
+}
+:root[data-theme="dark"]{--paper:#12172b;--grid:#222a4a;--ink:#dbe4ff;--muted:#8f9bc9;--red:#ff7a6e;--good:#5fd6a0;--card:#1a2140;}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;color:var(--ink);
+  font-family:"Patrick Hand","Segoe Print","Comic Sans MS",cursive;
+  display:flex;align-items:center;justify-content:center;overflow-y:auto;
+}
+.sheet{
+  position:relative;width:min(560px,100%);margin:16px;padding:24px 24px 28px 56px;
+  background:var(--card);border:2px solid var(--ink);border-radius:6px;box-shadow:6px 6px 0 var(--ink);
+}
+.sheet::before{content:"";position:absolute;left:36px;top:0;bottom:0;width:2px;background:var(--red)}
+.bar{display:flex;justify-content:space-between;align-items:baseline;font-size:1.3rem;gap:12px}
+.bar b{font-size:2rem;font-weight:400}
+.time.low{color:var(--red)}
+.track{height:10px;border:2px solid var(--ink);border-radius:6px;margin:10px 0 0;overflow:hidden}
+.fill{height:100%;width:100%;background:var(--ink);transform-origin:left;transition:transform 1s linear}
+.fill.low{background:var(--red)}
+.teacher{display:flex;align-items:center;gap:10px;margin:14px 0 0}
+.teacher svg{flex:none;width:104px;height:auto;display:block}
+.teacher.big svg{width:140px}
+.bubble{position:relative;flex:1;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;font-size:1.2rem;line-height:1.25;background:var(--paper)}
+.bubble::before{content:"";position:absolute;left:-9px;top:50%;margin-top:-8px;width:14px;height:14px;background:var(--paper);border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+.eq{font-size:clamp(3rem,15vw,5.5rem);text-align:center;margin:18px 0 14px;line-height:1;white-space:nowrap}
+.eq span.plus{color:var(--red);padding:0 .25em}
+.eq span.pulse{display:inline-block;animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(1.25);color:var(--good)}to{transform:scale(1)}}
+input{
+  width:100%;font:inherit;font-size:2.4rem;text-align:center;color:var(--ink);background:transparent;
+  border:0;border-bottom:3px solid var(--ink);padding:4px 0;outline:none;border-radius:0;
+}
+input:focus-visible{border-bottom-color:var(--red)}
+input.bad{animation:shake .3s;border-bottom-color:var(--red)}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+button{
+  font:inherit;font-size:1.5rem;color:var(--paper);background:var(--ink);border:2px solid var(--ink);
+  padding:10px 28px;border-radius:6px;cursor:pointer;box-shadow:3px 3px 0 var(--red);
+}
+button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--red)}
+button:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+.center{text-align:center}
+h1{font-size:3rem;font-weight:400;margin:0 0 8px}
+p{font-size:1.25rem;margin:8px 0 22px;line-height:1.4}
+.big{font-size:5rem;line-height:1;margin:4px 0}
+.hidden{display:none}
+.center .teacher{justify-content:center;margin:0 0 18px;text-align:left}
+@media (max-width:420px){.sheet{padding-left:46px}.sheet::before{left:28px}.teacher svg{width:84px}.teacher.big svg{width:104px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="sheet">
+  <section id="start" class="center">
+    <h1>Sum Sprint</h1>
+    <div class="teacher big"><div id="pStart"></div><div class="bubble">Hi, I'm Professor Mia! Answer each sum before its 10 seconds run out.</div></div>
+    <p>Add the two numbers and type the answer. Every correct sum scores 1 point and the clock restarts for the next one.</p>
+    <button id="startBtn">Start game</button>
+  </section>
+
+  <section id="play" class="hidden">
+    <div class="bar">
+      <div>Score <b id="score">0</b></div>
+      <div class="time" id="timeBox">Time <b id="time">10</b>s</div>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="teacher"><div id="pPlay"></div><div class="bubble" id="say" aria-live="polite"></div></div>
+    <div class="eq" id="eq"></div>
+    <input id="answer" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="?" aria-label="Your answer">
+  </section>
+
+  <section id="over" class="center hidden">
+    <h1>Time's up</h1>
+    <div class="teacher big"><div id="pOver"></div><div class="bubble" id="overSay"></div></div>
+    <p>Your score</p>
+    <div class="big" id="final">0</div>
+    <p id="best"></p>
+    <button id="againBtn">Play again</button>
+  </section>
+</main>
+
+<script>
+(function(){
+  var PER_QUESTION = 10;
+  var $ = function(id){ return document.getElementById(id); };
+  var start=$("start"), play=$("play"), over=$("over");
+  var eq=$("eq"), input=$("answer"), say=$("say");
+  var scoreEl=$("score"), timeEl=$("time"), timeBox=$("timeBox"), fill=$("fill");
+  var score=0, left=PER_QUESTION, target=0, timer=null, running=false;
+
+  /* Cartoon professor, drawn as inline SVG with four expressions */
+  function prof(m){
+    var K="#1b2a6b", f="", e="", b="", mo="", x="";
+    if(m==="happy"){
+      e='<path d="M72 93q12-13 24 0M104 93q12-13 24 0" fill="none" stroke="'+K+'" stroke-width="3.5" stroke-linecap="round"/>';
+      b='<path d="M74 72q10-6 20 0M106 72q10-6 20 0" fill="none" stroke="#4a2c2a" stroke-width="3" stroke-linecap="round"/>';
+      mo='<path d="M86 112q14 20 28 0z" fill="#7a2230" stroke="'+K+'" stroke-width="2.5" stroke-linejoin="round"/>';
+      x='<path d="M150 60l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#f2b705"/>';
+    } else if(m==="oops"){
+      e='<circle cx="84" cy="93" r="3.5" fill="'+K+'"/><circle cx="116" cy="93" r="3.5" fill="'+K+'"/>';
+      b='<path d="M72 78l22-6M128 78l-22-6" fill="none" stroke="#4a2c2a" stroke-width="3" stroke-linecap="round"/>';
+      mo='<path d="M88 118q6-6 12 0t12 0" fill="none" stroke="#a63a30" stroke-width="3" stroke-linecap="round"/>';
+      x='<path d="M152 62q-7 11 0 14t0-14z" fill="#5bb8f0" stroke="'+K+'" stroke-width="2"/>';
+    } else if(m==="sad"){
+      e='<path d="M72 92q12 11 24 0M104 92q12 11 24 0" fill="none" stroke="'+K+'" stroke-width="3.5" stroke-linecap="round"/>';
+      b='<path d="M72 74l22 5M128 74l-22 5" fill="none" stroke="#4a2c2a" stroke-width="3" stroke-linecap="round"/>';
+      mo='<path d="M89 122q11-10 22 0" fill="none" stroke="#a63a30" stroke-width="3" stroke-linecap="round"/>';
+      x='<path d="M82 106q-6 10 0 12t0-12z" fill="#5bb8f0" stroke="'+K+'" stroke-width="2"/>';
+    } else {
+      e='<circle cx="84" cy="93" r="3.5" fill="'+K+'"/><circle cx="116" cy="93" r="3.5" fill="'+K+'"/>';
+      b='<path d="M74 75q10-5 20 0M106 75q10-5 20 0" fill="none" stroke="#4a2c2a" stroke-width="3" stroke-linecap="round"/>';
+      mo='<path d="M90 113q10 8 20 0" fill="none" stroke="#a63a30" stroke-width="3" stroke-linecap="round"/>';
+      x='<path d="M150 150l30-34" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/><circle cx="182" cy="113" r="4" fill="#fff" stroke="'+K+'" stroke-width="2"/>';
+    }
+    return '<svg viewBox="0 0 200 220" role="img" aria-label="Cartoon of a young woman math professor">'
+    +'<g stroke="'+K+'" stroke-width="2.5" stroke-linejoin="round">'
+    +'<circle cx="100" cy="30" r="16" fill="#4a2c2a"/>'
+    +'<path d="M54 96Q50 40 100 40Q150 40 146 96L148 152Q140 162 128 152L72 152Q60 162 52 152Z" fill="#4a2c2a"/>'
+    +'<rect x="90" y="130" width="20" height="26" fill="#f5c6a0"/>'
+    +'<path d="M30 220Q34 162 72 152L128 152Q166 162 170 220Z" fill="#2f7d8c"/>'
+    +'<path d="M84 152L100 184L116 152Z" fill="#fff"/>'
+    +'<ellipse cx="100" cy="92" rx="42" ry="46" fill="#f5c6a0"/>'
+    +'<path d="M58 92Q60 46 100 46Q140 46 142 92Q120 64 100 68Q80 64 58 92Z" fill="#4a2c2a"/></g>'
+    +'<ellipse cx="72" cy="108" rx="8" ry="5" fill="#f08a7e" opacity=".55"/><ellipse cx="128" cy="108" rx="8" ry="5" fill="#f08a7e" opacity=".55"/>'
+    +b+e+mo
+    +'<g fill="#fff" fill-opacity=".25" stroke="#3a2a55" stroke-width="3"><circle cx="84" cy="93" r="15"/><circle cx="116" cy="93" r="15"/><path d="M99 92h2" fill="none"/></g>'
+    +x+'</svg>';
+  }
+  $("pStart").innerHTML=prof("ask");
+  var pPlay=$("pPlay");
+
+  var MSG={
+    ask:["Here's your next sum!","Add them up, quick!","Think carefully!","You can do this!"],
+    happy:["Brilliant!","Correct! Next one!","Spot on!","Top marks!"],
+    oops:["Not quite. Try again!","Check your addition!","Oh! Have another go."]
+  };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function mood(m){ pPlay.innerHTML=prof(m); say.textContent=pick(MSG[m]); }
+
+  function show(el){ [start,play,over].forEach(function(s){ s.classList.add("hidden"); }); el.classList.remove("hidden"); }
+  function rnd(){ return Math.floor(Math.random()*90)+10; }
+
+  function resetClock(){
+    clearInterval(timer);
+    left=PER_QUESTION; timeEl.textContent=left;
+    timeBox.classList.remove("low"); fill.classList.remove("low");
+    fill.style.transition="none"; fill.style.transform="scaleX(1)";
+    void fill.offsetWidth; fill.style.transition="";
+    timer=setInterval(tick,1000);
+  }
+
+  function newQuestion(){
+    var a=rnd(), b=rnd();
+    target=a+b;
+    eq.innerHTML='<span class="pulse">'+a+'</span><span class="plus">+</span><span class="pulse">'+b+'</span>';
+    input.value="";
+    resetClock();
+  }
+
+  function tick(){
+    left--;
+    timeEl.textContent=left;
+    fill.style.transform="scaleX("+(left/PER_QUESTION)+")";
+    if(left<=3){ timeBox.classList.add("low"); fill.classList.add("low"); }
+    if(left<=0) end();
+  }
+
+  function begin(){
+    score=0; running=true; scoreEl.textContent="0";
+    show(play); mood("ask"); newQuestion(); input.focus();
+  }
+
+  function end(){
+    running=false; clearInterval(timer);
+    var best=0;
+    try{ best=parseInt(localStorage.getItem("sumsprint-best")||"0",10)||0; }catch(e){}
+    var msg;
+    if(score>best){ msg="New best score!"; best=score; try{ localStorage.setItem("sumsprint-best",String(best)); }catch(e){} }
+    else { msg="Best score: "+best; }
+    var proud=score>=5;
+    $("pOver").innerHTML=prof(proud?"happy":"sad");
+    $("overSay").textContent=proud?"Well done! That was a great run.":"The clock beat you this time. Try again!";
+    $("final").textContent=score; $("best").textContent=msg;
+    show(over); $("againBtn").focus();
+  }
+
+  function submit(){
+    if(!running) return;
+    var v=input.value.trim();
+    if(v==="") return;
+    if(parseInt(v,10)===target){
+      score++; scoreEl.textContent=score; mood("happy");
+      newQuestion();
+    } else {
+      mood("oops");
+      input.classList.remove("bad"); void input.offsetWidth; input.classList.add("bad");
+      input.select();
+    }
+  }
+
+  input.addEventListener("input",function(){ input.value=input.value.replace(/[^0-9]/g,""); });
+  input.addEventListener("keydown",function(e){ if(e.key==="Enter") submit(); });
+  $("startBtn").addEventListener("click",begin);
+  $("againBtn").addEventListener("click",begin);
+})();
+</script>
+</body>
+</html>
